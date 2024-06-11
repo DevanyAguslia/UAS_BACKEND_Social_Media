@@ -1,12 +1,12 @@
+
 <?php
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\FriendshipController;
 
-// Route::get('/', function () {
-//     return view('welcome');
-// })->middleware('auth')->name('home');
+
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
 Route::post('/login', [AuthController::class, 'login'])->middleware('guest');
@@ -16,4 +16,19 @@ Route::post('/register', [AuthController::class, 'register'])->middleware('guest
 
 Route::get('/profile', [ProfileController::class, 'show'])->middleware('auth')->name('profile');
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');
+
+// Routes for Social Connection
+Route::post('/friend-request/send', [FriendshipController::class, 'sendFriendRequest'])->middleware('auth');
+Route::post('/friend-request/accept', [FriendshipController::class, 'acceptFriendRequest'])->middleware('auth');
+Route::post('/friend-request/reject', [FriendshipController::class, 'rejectFriendRequest'])->middleware('auth');
+Route::get('/friend-list', [FriendshipController::class, 'getFriendList'])->middleware('auth');
+
+Route::get('/search-users', [FriendshipController::class, 'searchUsers'])->middleware('auth')->name('search-users');
+
+Route::get('/friend-requests', [FriendshipController::class, 'showFriendRequests'])->middleware('auth')->name('friend-requests');
+Route::get('/friend-list', [FriendshipController::class, 'showFriendList'])->middleware('auth')->name('friend-list');
+
+Route::post('/send-friend-request', [FriendshipController::class, 'sendFriendRequest'])->name('send-friend-request');
+Route::post('/accept-friend-request', [FriendshipController::class, 'acceptFriendRequest'])->name('accept-friend-request');
+Route::post('/reject-friend-request', [FriendshipController::class, 'rejectFriendRequest'])->name('reject-friend-request');
 

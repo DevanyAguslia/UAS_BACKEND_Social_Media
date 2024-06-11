@@ -18,6 +18,10 @@
                 @csrf
                 <button type="submit" class="logout-button">Logout</button>
             </form>
+            <!-- Button to Friend Requests Page -->
+            <a href="{{ route('friend-requests') }}" class="btn btn-primary">Friend Requests</a>
+            <!-- Button to Friend List Page -->
+            <a href="{{ route('friend-list') }}" class="btn btn-primary">Friend List</a>
         </div>
     </div>
 </body>
