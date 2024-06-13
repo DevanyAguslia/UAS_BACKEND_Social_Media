@@ -40,3 +40,19 @@ Route::middleware('auth')->group(function () {
     Route::get('messages/create', [MessageController::class, 'create'])->name('messages.create');
     Route::post('messages', [MessageController::class, 'store'])->name('messages.store');
 });
+
+// routes/web.php (fanny)
+
+Route::get('/feeds', [App\Http\Controllers\FeedController::class, 'index'])->name('feeds.index');
+Route::post('/feeds', [App\Http\Controllers\FeedController::class, 'store'])->name('feeds.store');
+Route::delete('/feeds/{feed}', [App\Http\Controllers\FeedController::class, 'destroy'])->name('feeds.destroy');
+
+Route::post('/comments/{feed_id}', [App\Http\Controllers\CommentController::class, 'store'])->name('comments.store');
+
+Route::post('/likes/{feed_id}', [App\Http\Controllers\LikeController::class, 'toggle'])->name('likes.toggle');
+
+use App\Http\Controllers\FeedController;
+
+Route::get('/feeds/create', [FeedController::class, 'create'])->name('feeds.create');
+
+Route::get('/feeds/create', [FeedController::class, 'showCreateForm'])->name('feeds.create');

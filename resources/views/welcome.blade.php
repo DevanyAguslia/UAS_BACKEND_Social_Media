@@ -1,3 +1,5 @@
+<!-- resources/views/profile.blade.php -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,6 +27,9 @@
             <!-- Button to Messages Page -->
             <a href="{{ route('messages.index') }}" class="btn btn-primary">Inbox</a>
             <a href="{{ route('messages.create') }}" class="btn btn-primary">New Message</a>
+
+            <!-- Button to Feeds Page -->
+            <a href="{{ route('feeds.index') }}" class="btn btn-primary">Feeds</a>
         </div>
     </div>
 </body>
