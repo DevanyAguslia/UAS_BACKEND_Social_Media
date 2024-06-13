@@ -22,6 +22,9 @@
             <a href="{{ route('friend-requests') }}" class="btn btn-primary">Friend Requests</a>
             <!-- Button to Friend List Page -->
             <a href="{{ route('friend-list') }}" class="btn btn-primary">Friend List</a>
+            <!-- Button to Messages Page -->
+            <a href="{{ route('messages.index') }}" class="btn btn-primary">Inbox</a>
+            <a href="{{ route('messages.create') }}" class="btn btn-primary">New Message</a>
         </div>
     </div>
 </body>

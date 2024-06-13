@@ -32,3 +32,11 @@ Route::post('/send-friend-request', [FriendshipController::class, 'sendFriendReq
 Route::post('/accept-friend-request', [FriendshipController::class, 'acceptFriendRequest'])->name('accept-friend-request');
 Route::post('/reject-friend-request', [FriendshipController::class, 'rejectFriendRequest'])->name('reject-friend-request');
 
+// Route Message (Eunice)
+use App\Http\Controllers\MessageController;
+
+Route::middleware('auth')->group(function () {
+    Route::get('messages', [MessageController::class, 'index'])->name('messages.index');
+    Route::get('messages/create', [MessageController::class, 'create'])->name('messages.create');
+    Route::post('messages', [MessageController::class, 'store'])->name('messages.store');
+});
