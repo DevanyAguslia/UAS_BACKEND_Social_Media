@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use App\Models\Feed;
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Storage;
 
 class FeedController extends Controller
 {
@@ -42,7 +45,7 @@ class FeedController extends Controller
 
         $feed->save();
 
-        return redirect()->back()->with('success', 'Feed berhasil diposting.');
+        return redirect()->route('feeds.index')->with('success', 'Feed berhasil diposting.');;
     }
 
     public function destroy(Feed $feed)

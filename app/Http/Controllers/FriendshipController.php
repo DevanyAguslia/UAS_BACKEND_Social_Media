@@ -9,12 +9,6 @@ use App\Models\Friendship;
 
 class FriendshipController extends Controller
 {
-    /**
-     * Mengirim permintaan pertemanan.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function sendFriendRequest(Request $request)
     {
         $user = Auth::user();
@@ -22,7 +16,7 @@ class FriendshipController extends Controller
 
         $receiver = User::find($receiverId);
         if (!$receiver) {
-            return response()->json(['error' => 'Penerima tidak ditemukan'], 404);
+            return redirect()->back()->with('error', 'Penerima tidak ditemukan');
         }
 
         $existingRequest = Friendship::where('sender_id', $user->id)
@@ -30,7 +24,7 @@ class FriendshipController extends Controller
             ->first();
 
         if ($existingRequest) {
-            return response()->json(['error' => 'Permintaan pertemanan sudah dikirim'], 400);
+            return redirect()->back()->with('error', 'Permintaan pertemanan sudah dikirim');
         }
 
         Friendship::create([
@@ -39,57 +33,11 @@ class FriendshipController extends Controller
             'status' => 'pending',
         ]);
 
-        return response()->json(['message' => 'Permintaan pertemanan terkirim']);
+        return redirect()->back()->with('success', 'Permintaan pertemanan terkirim');
     }
 
-    /**
-     * Menerima permintaan pertemanan.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
- public function acceptFriendRequest(Request $request)
-{
-    $user = Auth::user();
-    $requestId = $request->input('request_id');
 
-    $friendshipRequest = Friendship::find($requestId);
-
-    if (!$friendshipRequest || $friendshipRequest->receiver_id !== $user->id) {
-        return response()->json(['error' => 'Permintaan pertemanan tidak ditemukan'], 404);
-    }
-
-    $friendshipRequest->status = 'accepted';
-    $friendshipRequest->save();
-
-    // Mendapatkan daftar teman setelah permintaan pertemanan diterima
-    $friends = Friendship::where('status', 'accepted')
-        ->where(function ($query) use ($user) {
-            $query->where('sender_id', $user->id)
-                ->orWhere('receiver_id', $user->id);
-        })
-        ->with(['sender', 'receiver'])
-        ->get();
-
-    // Menyusun informasi teman
-    $friendsList = [];
-    foreach ($friends as $friendship) {
-        $friendsList[] = $friendship->sender_id == $user->id ? $friendship->receiver : $friendship->sender;
-    }
-
-    // Mengembalikan tampilan dengan daftar teman yang diperbarui
-    return redirect()->route('friend-list')->with('friends', $friendsList);
-}
-
-    
-
-    /**
-     * Menolak permintaan pertemanan.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function rejectFriendRequest(Request $request)
+    public function acceptFriendRequest(Request $request)
     {
         $user = Auth::user();
         $requestId = $request->input('request_id');
@@ -100,18 +48,43 @@ class FriendshipController extends Controller
             return response()->json(['error' => 'Permintaan pertemanan tidak ditemukan'], 404);
         }
 
-        $friendshipRequest->status = 'rejected';
+        $friendshipRequest->status = 'accepted';
         $friendshipRequest->save();
 
-        return response()->json(['message' => 'Permintaan pertemanan ditolak']);
+        $friends = Friendship::where('status', 'accepted')
+            ->where(function ($query) use ($user) {
+                $query->where('sender_id', $user->id)
+                    ->orWhere('receiver_id', $user->id);
+            })
+            ->with(['sender', 'receiver'])
+            ->get();
+
+        $friendsList = [];
+        foreach ($friends as $friendship) {
+            $friendsList[] = $friendship->sender_id == $user->id ? $friendship->receiver : $friendship->sender;
+        }
+
+        return redirect()->route('friend-list')->with('friends', $friendsList);
     }
 
-    /**
-     * Mendapatkan daftar teman.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
+    public function rejectFriendRequest(Request $request)
+    {
+        $user = Auth::user();
+        $requestId = $request->input('request_id');
+    
+        $friendshipRequest = Friendship::find($requestId);
+    
+        if (!$friendshipRequest || $friendshipRequest->receiver_id !== $user->id) {
+            return redirect()->back()->with('error', 'Permintaan pertemanan tidak ditemukan');
+        }
+    
+        $friendshipRequest->status = 'rejected';
+        $friendshipRequest->save();
+    
+        return redirect()->back()->with('success', 'Permintaan pertemanan ditolak');
+    }
+    
+
     public function getFriendList(Request $request)
     {
         $user = Auth::user();
@@ -132,50 +105,32 @@ class FriendshipController extends Controller
         return response()->json($friends);
     }
 
-    /**
-     * Menampilkan permintaan pertemanan yang masih tertunda.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function showFriendRequests()
     {
         $friendRequests = Friendship::where('receiver_id', auth()->id())->where('status', 'pending')->get();
-        return view('friend-requests', compact('friendRequests'));
+        return view('friendship.friend-requests', compact('friendRequests'));
     }
 
-    /**
-     * Menampilkan daftar teman.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function showFriendList()
-    {   
+    {
         $user = auth()->user();
         $friendships = Friendship::where('status', 'accepted')
             ->where(function ($query) use ($user) {
-            $query->where('sender_id', $user->id)
-            ->orWhere('receiver_id', $user->id);
-        })
-        ->get();
+                $query->where('sender_id', $user->id)
+                    ->orWhere('receiver_id', $user->id);
+            })
+            ->get();
 
         $friendIds = $friendships->pluck('sender_id')->merge($friendships->pluck('receiver_id'));
         $friends = User::whereIn('id', $friendIds)->get();
 
-        return view('friend-list', compact('friends'));
+        return view('friendship.friend-list', compact('friends'));
     }
 
-        /**
-     * Mencari pengguna berdasarkan nama.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function searchUsers(Request $request)
     {
         $search = $request->input('search');
         $users = User::where('username', 'like', "%$search%")->get();
-        // return response()->json($users);
-        return view('addFriend',['dicari'=> $users]);
+        return view('friendship.addFriend', ['dicari' => $users]);
     }
-
 }

@@ -7,6 +7,19 @@
 </head>
 <body>
     <h1>Friend Requests</h1>
+
+    @if (session('success'))
+        <div style="color: green;">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div style="color: red;">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <form action="{{ route('search-users') }}" method="GET">
         <input type="text" name="search" placeholder="Search users...">
         <button type="submit">Search</button>
