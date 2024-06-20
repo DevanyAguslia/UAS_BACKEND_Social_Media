@@ -3,23 +3,22 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Feed;
 use App\Models\Like;
+use App\Models\Feed;
 
 class LikeController extends Controller
 {
-    public function toggle(Request $request, $feed_id)
+    public function store(Request $request, Feed $feed)
     {
-        $feed = Feed::findOrFail($feed_id);
-
-        $like = $feed->likes()->where('user_id', auth()->id())->first();
+        $like = Like::where('feed_id', $feed->id)->where('user_id', auth()->id())->first();
 
         if ($like) {
             $like->delete();
         } else {
-            $like = new Like();
-            $like->user_id = auth()->id();
-            $feed->likes()->save($like);
+            Like::create([
+                'user_id' => auth()->id(),
+                'feed_id' => $feed->id,
+            ]);
         }
 
         return redirect()->back();

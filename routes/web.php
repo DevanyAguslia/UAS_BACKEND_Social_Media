@@ -46,3 +46,14 @@ Route::post('/feeds', [FeedController::class, 'store'])->name('feeds.store');
 Route::delete('/feeds/{feed}', [FeedController::class, 'destroy'])->name('feeds.destroy');
 Route::get('/feeds/create', [FeedController::class, 'showCreateForm'])->name('feeds.create');
 Route::resource('feeds', FeedController::class);
+
+
+// dina (like dan komen)
+
+use App\Http\Controllers\LikeController;
+use App\Http\Controllers\CommentController;
+
+Route::middleware('auth')->group(function () {
+    Route::post('feeds/{feed}/like', [LikeController::class, 'store'])->name('feeds.like');
+    Route::post('feeds/{feed}/comment', [CommentController::class, 'store'])->name('feeds.comment');
+});

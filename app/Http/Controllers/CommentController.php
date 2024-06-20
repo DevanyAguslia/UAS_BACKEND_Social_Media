@@ -3,23 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Feed;
 use App\Models\Comment;
+use App\Models\Feed;
 
 class CommentController extends Controller
 {
-    public function store(Request $request, $feed_id)
+    public function store(Request $request, Feed $feed)
     {
         $request->validate([
-            'content' => 'required'
+            'comment' => 'required|string|max:255',
         ]);
 
-        $comment = new Comment();
-        $comment->user_id = auth()->id();
-        $comment->feed_id = $feed_id;
-        $comment->content = $request->content;
-        $comment->save();
+        Comment::create([
+            'user_id' => auth()->id(),
+            'feed_id' => $feed->id,
+            'comment' => $request->comment,
+        ]);
 
-        return redirect()->back()->with('success', 'Komentar berhasil ditambahkan.');
+        return redirect()->back();
     }
 }
