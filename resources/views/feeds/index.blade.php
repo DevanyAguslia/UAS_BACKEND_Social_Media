@@ -1,5 +1,3 @@
-<!-- resources/views/feeds/index.blade.php -->
-
 @extends('layouts.app')
 
 @section('content')
@@ -23,7 +21,10 @@
 
                     @foreach($feeds as $feed)
                         <div class="media mb-3">
-                            <!-- <img src="{{ asset('storage/' . $feed->image) }}" class="mr-3" alt="{{ $feed->content }}" style="max-width: 100px;"> -->
+                            <!-- Tampilkan gambar jika ada -->
+                            @if($feed->image)
+                                <img src="{{ asset('storage/' . $feed->image) }}" class="mr-3" alt="{{ $feed->content }}" style="max-width: 100px;">
+                            @endif
                             <div class="media-body">
                                 <h5 class="mt-0">{{ $feed->user->username }}</h5>
                                 <p>{{ $feed->content }}</p>
@@ -31,6 +32,14 @@
                                 @if($feed->image)
                                     <img src="{{ asset('storage/' . $feed->image) }}" alt="Feed Image" style="max-width: 300px;">
                                 @endif
+                                <div class="mt-2">
+                                    <a href="{{ route('feeds.edit', $feed->id) }}" class="btn btn-secondary">Edit</a>
+                                    <form action="{{ route('feeds.destroy', $feed->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-danger">Delete</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     @endforeach

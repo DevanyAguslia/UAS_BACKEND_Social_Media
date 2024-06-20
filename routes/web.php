@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FriendshipController;
-
+use App\Http\Controllers\FeedController;
 
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
@@ -41,9 +41,8 @@ Route::middleware('auth')->group(function () {
 
 // routes/web.php (fanny)
 
-use App\Http\Controllers\FeedController;
-
 Route::get('/feeds', [FeedController::class, 'index'])->name('feeds.index');
 Route::post('/feeds', [FeedController::class, 'store'])->name('feeds.store');
 Route::delete('/feeds/{feed}', [FeedController::class, 'destroy'])->name('feeds.destroy');
 Route::get('/feeds/create', [FeedController::class, 'showCreateForm'])->name('feeds.create');
+Route::resource('feeds', FeedController::class);

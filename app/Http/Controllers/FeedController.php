@@ -19,7 +19,7 @@ class FeedController extends Controller
     }
 
      // Menampilkan halaman pembuatan feed
-     public function showCreateForm()
+     public function Create()
      {
          return view('feeds.create');
      }
@@ -48,18 +48,11 @@ class FeedController extends Controller
         return redirect()->route('feeds.index')->with('success', 'Feed berhasil diposting.');;
     }
 
-    public function destroy(Feed $feed)
-    {
-        $feed->delete();
-
-        return redirect()->back()->with('success', 'Feed berhasil dihapus.');
-    }
-
     public function edit(Feed $feed)
     {
         // Pastikan hanya pemilik feed yang dapat mengedit
         if (Auth::id() !== $feed->user_id) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengedit feed ini.');
+            return redirect()->route('feeds.index')->with('error', 'Anda tidak memiliki izin untuk mengedit feed ini.');
         }
 
         return view('feeds.edit', compact('feed'));
@@ -75,7 +68,7 @@ class FeedController extends Controller
 
         // Pastikan hanya pemilik feed yang dapat mengedit
         if (Auth::id() !== $feed->user_id) {
-            return redirect()->back()->with('error', 'Anda tidak memiliki izin untuk mengedit feed ini.');
+            return redirect()->route('feeds.index')->with('error', 'Anda tidak memiliki izin untuk mengedit feed ini.');
         }
 
         // Update feed
@@ -92,6 +85,23 @@ class FeedController extends Controller
 
         $feed->save();
 
-        return redirect()->back()->with('success', 'Feed berhasil diperbarui.');
+        return redirect()->route('feeds.index')->with('success', 'Feed berhasil diperbarui.');
+    }
+
+    public function destroy(Feed $feed)
+    {
+        // Pastikan hanya pemilik feed yang dapat menghapus
+        if (Auth::id() !== $feed->user_id) {
+            return redirect()->route('feeds.index')->with('error', 'Anda tidak memiliki izin untuk menghapus feed ini.');
+        }
+
+        // Hapus file gambar jika ada
+        if ($feed->image) {
+            Storage::disk('public')->delete($feed->image);
+        }
+
+        $feed->delete();
+
+        return redirect()->back()->with('success', 'Feed berhasil dihapus.');
     }
 }
