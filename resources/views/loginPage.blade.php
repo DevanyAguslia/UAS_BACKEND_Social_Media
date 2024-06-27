@@ -10,12 +10,18 @@
     <form action="{{ route('login') }}" method="POST">
         @csrf
         <label for="username">Username:</label>
-        <input type="text" id="username" name="username" required>
+        <input type="text" id="username" name="username" value="{{ old('username') }}" required>
+        @if ($errors->has('username'))
+            <span>{{ $errors->first('username') }}</span>
+        @endif
         
         <br><br>
         
         <label for="password">Password:</label>
         <input type="password" id="password" name="password" required>
+        @if ($errors->has('password'))
+            <span>{{ $errors->first('password') }}</span>
+        @endif
         
         <br><br>
         
