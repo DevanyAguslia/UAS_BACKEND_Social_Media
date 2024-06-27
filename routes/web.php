@@ -6,6 +6,16 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\FriendshipController;
 use App\Http\Controllers\FeedController;
+use App\Http\Controllers\HomeController;
+
+
+// Route untuk halaman "Welcome to Chatter"
+Route::get('/', [HomeController::class, 'welcome'])->name('home');
+
+// Route fallback untuk menangani 404
+Route::fallback(function () {
+    return redirect()->route('home');
+});
 
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->middleware('guest')->name('login');
