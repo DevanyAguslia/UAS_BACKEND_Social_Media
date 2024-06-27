@@ -1,3 +1,5 @@
+<!-- resources/views/friendship/friend-list.blade.php -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -35,7 +37,14 @@
         @else
             @foreach ($friends as $friend)
                 @if ($friend->username != auth()->user()->username)
-                    <li>{{ $friend->username }}</li>
+                    <li>
+                        {{ $friend->username }}
+                        <form action="{{ route('unfriend') }}" method="POST" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="friend_id" value="{{ $friend->id }}">
+                            <button type="submit">Unfriend</button>
+                        </form>
+                    </li>
                 @endif
             @endforeach
         @endif

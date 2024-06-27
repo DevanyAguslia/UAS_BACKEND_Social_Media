@@ -38,6 +38,7 @@ Route::middleware(['auth', 'web'])->group(function () {
     Route::post('/send-friend-request', [FriendshipController::class, 'sendFriendRequest'])->name('send-friend-request');
     Route::post('/accept-friend-request', [FriendshipController::class, 'acceptFriendRequest'])->name('accept-friend-request');
     Route::post('/reject-friend-request', [FriendshipController::class, 'rejectFriendRequest'])->name('reject-friend-request');
+    Route::post('/unfriend', [FriendshipController::class, 'unfriend'])->name('unfriend'); // Route untuk unfriend
 });
 
 // Route Message (Eunice)

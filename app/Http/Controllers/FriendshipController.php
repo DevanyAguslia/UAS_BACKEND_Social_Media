@@ -127,10 +127,43 @@ class FriendshipController extends Controller
         return view('friendship.friend-list', compact('friends'));
     }
 
+    
     public function searchUsers(Request $request)
     {
         $search = $request->input('search');
         $users = User::where('username', 'like', "%$search%")->get();
-        return view('friendship.addFriend', ['dicari' => $users]);
+        $currentUser = Auth::user();
+
+        $friends = Friendship::where('status', 'accepted')
+            ->where(function ($query) use ($currentUser) {
+                $query->where('sender_id', $currentUser->id)
+                    ->orWhere('receiver_id', $currentUser->id);
+            })
+            ->get();
+
+        $friendIds = $friends->pluck('sender_id')->merge($friends->pluck('receiver_id'))->unique();
+
+        return view('friendship.addFriend', ['dicari' => $users, 'friendIds' => $friendIds]);
+    }
+
+    public function unfriend(Request $request)
+    {
+        $user = Auth::user();
+        $friendId = $request->input('friend_id');
+
+        $friendship = Friendship::where(function ($query) use ($user, $friendId) {
+            $query->where('sender_id', $user->id)
+                  ->where('receiver_id', $friendId);
+        })->orWhere(function ($query) use ($user, $friendId) {
+            $query->where('sender_id', $friendId)
+                  ->where('receiver_id', $user->id);
+        })->first();
+
+        if ($friendship) {
+            $friendship->delete();
+            return redirect()->back()->with('success', 'Teman berhasil dihapus');
+        } else {
+            return redirect()->back()->with('error', 'Teman tidak ditemukan');
+        }
     }
 }
